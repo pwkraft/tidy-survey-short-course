@@ -1,12 +1,13 @@
 ---
 title: "Continous Data Analysis Exercise Solutions"
 output:
+  pdf_document:
   html_document:
     df_print: paged
 ---
 
 # Set-up
-```{r}
+```{r setup, message=FALSE, warning=FALSE}
 library(tidyverse) # for tidyverse
 library(here) # for file paths
 library(survey) # for survey analysis

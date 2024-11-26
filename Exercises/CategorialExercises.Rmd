@@ -22,8 +22,6 @@ anes_des <- anes %>%
                     nest = TRUE)
 ```
 
-# Part 1
-
 1. How many females have a graduate degree? Hint: the variables `Gender` and `Education` will be useful.
 
 ```{r ex1_1}
@@ -58,32 +56,16 @@ anes_des <- anes %>%
 
 ```
 
-# Part 2
+6. Were people who lean democrat more likely to vote early in the 2020 election? Use a logistic regression.
 
-1. Is there a relationship between PartyID and whether people voted early?
-
-```{r ex2_1}
+```{r ex1_6}
 
 ```
-
-
-2. Is there a relationship between PartyID and trust in the government? Hints: `TrustGovernment` indicates how strongly people trust the government. Use Wald as the `statistic` option.
-
-```{r ex2_2}
-
-```
-
 
 # Bonus
 
 1. What percentage of people lean republican? These are individuals that are strong republicans, not very strong republicans and are independent-republicans. Include an appropriate confidence interval. Hint: to get the correct confidence interval, create a new variable BEFORE calculating the estimate.
 
 ```{r exb_1}
-
-```
-
-2. Were people who lean democrat more likely to vote early in the 2020 election? Hint: use a logistic model and 3-level party variable to use in the model.
-
-```{r exb_2}
 
 ```

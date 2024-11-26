@@ -1,12 +1,13 @@
 ---
 title: "Categorical Data Analysis Exercise Solutions"
 output:
+  pdf_document:
   html_document:
     df_print: paged
 ---
 
 # Set-up
-```{r setup}
+```{r setup, message=FALSE, warning=FALSE}
 library(tidyverse) # for tidyverse
 library(here) # for file paths
 library(survey) # for survey analysis
@@ -21,8 +22,6 @@ anes_des <- anes %>%
                     ids = VarUnit,
                     nest = TRUE)
 ```
-
-# Part 1
 
 1. How many females have a graduate degree? Hint: the variables `Gender` and `Education` will be useful.
 
@@ -101,11 +100,9 @@ There are `r formatC(pull(femgd, N), format="d", big.mark=",")` females with a g
 
 The design effect is `r round(pull(pdeff, p_deff), 2)`.
 
-# Part 2
+6. Were people who lean democrat more likely to vote early in the 2020 election? Use a logistic regression.
 
-1. Is there a relationship between PartyID and whether people voted early?
-
-```{r ex2_1}
+```{r ex1_6}
 anes_des %>%
    filter(!is.na(PartyID), !is.na(EarlyVote2020)) %>%
    group_by(PartyID, EarlyVote2020) %>%
@@ -116,31 +113,14 @@ anes_des %>%
    filter(EarlyVote2020=="Yes")
 
 (pid_vote <- anes_des %>%
-   svychisq(design=.,
-            formula=~PartyID +EarlyVote2020))
+   svyglm(design=.,
+          formula=(EarlyVote2020=="Yes")~PartyID,
+          family=quasibinomial(),
+          na.action=na.omit))
+summary(pid_vote)
 ```
 
-There is strong association with when people voted and their party, p-value=`r pluck(pid_vote, "p.value") %>% round(5)`
-
-2. Is there a relationship between PartyID and trust in the government? Hints: `TrustGovernment` indicates how strongly people trust the government. Use Wald as the `statistic` option.
-
-```{r ex2_2}
-anes_des %>%
-   filter(!is.na(PartyID), !is.na(TrustGovernment)) %>%
-   group_by(PartyID, TrustGovernment) %>%
-   summarise(
-      p=survey_mean(),
-      .groups="drop"
-   ) %>%
-   pivot_wider(id_cols=PartyID, names_from = "TrustGovernment", values_from="p")
-
-(pid_trust <- anes_des %>%
-   svychisq(design=.,
-            formula=~PartyID+TrustGovernment,
-            statistic="Wald"))
-```
-
-There is strong association with how much people trust government and their party, p-value=`r pluck(pid_trust, "p.value") %>% round(5)`
+Strong Democrats are more likely to vote early.
 
 # Bonus
 
@@ -176,43 +156,6 @@ anes_des %>%
    summarize(p=survey_prop(vartype="ci", proportion = TRUE))
 
 ```
-
-2. Were people who lean democrat more likely to vote early in the 2020 election? Hint: use a logistic model and 3-level party variable to use in the model.
-
-```{r exb_2}
-anes_des %>%
-   mutate(PartyID3=fct_collapse(PartyID,
-                                LeanDem=c("Strong democrat",
-                                          "Not very strong democrat",
-                                          "Independent-democrat"),
-                                LeanRep=c("Strong republican",
-                                          "Not very strong republican",
-                                          "Independent-republican"),
-                                other_level="Other")) %>%
-   filter(!is.na(PartyID3), !is.na(EarlyVote2020)) %>%
-   group_by(PartyID3, EarlyVote2020) %>%
-   summarise(
-      p=survey_prop(proportion = TRUE)
-   ) %>% filter(EarlyVote2020=="Yes")
-
-earlyv_glm<- anes_des %>%
-   mutate(PartyID3=fct_collapse(PartyID,
-                                LeanDem=c("Strong democrat",
-                                          "Not very strong democrat",
-                                          "Independent-democrat"),
-                                LeanRep=c("Strong republican",
-                                          "Not very strong republican",
-                                          "Independent-republican"),
-                                other_level="Other")) %>% 
-   svyglm(design=.,
-          formula=(EarlyVote2020=="Yes")~PartyID3,
-          family=quasibinomial(),
-          na.action=na.omit)
-
-summary(earlyv_glm)
-```
-
-Yes, there is evidence that those leaning democrat were more likely to vote early. They are the reference level in the model and the other coeffecients are negative and significant.
 
 # Session information
 

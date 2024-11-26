@@ -6,7 +6,7 @@ output:
 ---
 
 # Set-up
-```{r}
+```{r setup}
 library(tidyverse) # for tidyverse
 library(here) # for file paths
 library(survey) # for survey analysis
